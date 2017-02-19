@@ -15,7 +15,7 @@ public class LinePojoFormatter {
 		Set<String> matches = findMatches(template);
 		for (String s : matches) {
 			if (AppConstants.ORIGINAL_LINE.equals(s)) {
-				template = template.replaceAll("\\{" + s + "\\}", p.getOriginalLine());
+				template = template.replace("{" + s + "}", p.getOriginalLine());
 			} else {
 				String value = "";
 				try {
