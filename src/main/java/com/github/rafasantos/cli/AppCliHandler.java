@@ -29,7 +29,8 @@ public class AppCliHandler {
 	public enum CliOptions {
 		FIRST_INPUT_FILE("firstFile", "ff"), 
 		SECOND_INPUT_FILE("secondFile", "sf"),
-		HELP("help", "h"), 
+		HELP("help", "h"),
+		TEXT_DELIMITER("textDelimiter", "td"), 
 		EQUALS_TEMPLATE("equalsTemplate", "et"),
 		INSERT_TEMPLATE("insertTemplate", "it"),
 		UPDATE_TEMPATE("updateTemplate", "ut"),
@@ -48,10 +49,10 @@ public class AppCliHandler {
 			return this.shortText;
 		}
 	};
-
 	
 	private File firstFile;
 	private File secondFile;
+	private String textDelimiter = "\t";
 	private String equalsTemplate = "= {ORIGINAL_LINE}";
 	private String insertTemplate = "+ {ORIGINAL_LINE}";
 	private String updateTemplate = "! {ORIGINAL_LINE}";
@@ -80,6 +81,19 @@ public class AppCliHandler {
 				.hasArg(true)
 				.argName(CliOptions.SECOND_INPUT_FILE.toString())
 				.desc("Mandatory, the file path of the second file to be compared")
+				.build());
+
+		cliOptions.addOption( Option.builder(CliOptions.TEXT_DELIMITER.getShortText())
+				.longOpt(CliOptions.TEXT_DELIMITER.getLongText())
+				.required(false)
+				.hasArg(true)
+				.argName(CliOptions.TEXT_DELIMITER.toString())
+				.desc("The text delimiter used in conjunction to templates (e.g.: insertTemplate, deleteTemplate...)"
+						+ "\nThe delimiter must be included when using templates with numeric index (e.g.: '{0}', etc)."
+						+ "\nOtherwise unexpected results will occur."
+						+ "\nMost common delimiters are: tab '\\t', pipe '|' and comma ','"
+						+ "\nThe default value is '\\t'."
+						+ "\nThe delimiters are matched agains java regular expression.")
 				.build());
 		
 		cliOptions.addOption( Option.builder(CliOptions.HELP.getShortText())
@@ -140,6 +154,10 @@ public class AppCliHandler {
 		return secondFile;
 	}
 
+	public String getTextDelimiter() {
+		return textDelimiter;
+	}
+	
 	public String getUpdateTemplate() {
 		return updateTemplate;
 	}
@@ -171,7 +189,6 @@ public class AppCliHandler {
 		StringWriter stringWritter = new StringWriter();
 		PrintWriter printWritter = new PrintWriter(stringWritter);
 		HelpFormatter formatter = new HelpFormatter();
-		formatter.setWidth(150);
 		formatter.printHelp(printWritter, 
 				150, // Width
 				"java -jar <THIS_JAR.jar> -ff=<"+CliOptions.FIRST_INPUT_FILE+"> -sf=<"+CliOptions.SECOND_INPUT_FILE+"> \n\n", // Usage
@@ -202,6 +219,10 @@ public class AppCliHandler {
 	
 	public void setSecondFile(File secondFile) {
 		this.secondFile = secondFile;
+	}
+	
+	public void setTextDelimiter(String textDelimiter) {
+		this.textDelimiter = textDelimiter;
 	}
 	
 	public void setUpdateTemplate(String updateTemplate) {
