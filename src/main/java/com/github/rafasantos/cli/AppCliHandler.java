@@ -96,6 +96,14 @@ public class AppCliHandler {
 						+ "\nThe delimiters are matched against java regular expression.\t\n")
 				.build());
 
+		cliOptions.addOption(Option.builder(CliOptions.EQUALS_TEMPLATE.getShortText())
+				.longOpt(CliOptions.EQUALS_TEMPLATE.getLongText())
+				.required(false)
+				.hasArg(true)
+				.argName(CliOptions.EQUALS_TEMPLATE.toString())
+				.desc("The template used when a line is identified as 'new line'.\n")
+				.build());
+		
 		cliOptions.addOption(Option.builder(CliOptions.INSERT_TEMPLATE.getShortText())
 				.longOpt(CliOptions.INSERT_TEMPLATE.getLongText())
 				.required(false)
@@ -231,6 +239,7 @@ public class AppCliHandler {
 
 	private void readOptionValues(CommandLine cli) {
 		this.textDelimiter = cli.getOptionValue(CliOptions.TEXT_DELIMITER.getShortText(), this.textDelimiter);
+		this.equalsTemplate = cli.getOptionValue(CliOptions.EQUALS_TEMPLATE.getShortText(), this.equalsTemplate);
 		this.insertTemplate = cli.getOptionValue(CliOptions.INSERT_TEMPLATE.getShortText(), this.insertTemplate);
 		String firstFilePath = cli.getOptionValue(CliOptions.FIRST_INPUT_FILE.getShortText());
 		this.firstFile = new File(firstFilePath);
