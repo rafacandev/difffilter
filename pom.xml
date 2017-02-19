@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.github.rafasantos</groupId>
-	<artifactId>misc-diff</artifactId>
+	<artifactId>difffilter</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>diff</name>
+	<name>difffilter</name>
 	<description>Check for differences between files and apply templates.</description>
 
 	<properties>

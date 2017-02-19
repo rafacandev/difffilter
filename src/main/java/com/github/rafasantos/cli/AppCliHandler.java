@@ -32,6 +32,7 @@ public class AppCliHandler {
 		SECOND_INPUT_FILE("secondFile", "sf"),
 		HELP("help", "h"),
 		TEXT_DELIMITER("textDelimiter", "td"), 
+		UNIQUE_INDEXES("uniqueIndexes", "ui"),
 		EQUALS_TEMPLATE("equalsTemplate", "et"),
 		INSERT_TEMPLATE("insertTemplate", "it"),
 		UPDATE_TEMPLATE("updateTemplate", "ut"),
@@ -54,6 +55,7 @@ public class AppCliHandler {
 	private File firstFile;
 	private File secondFile;
 	private String textDelimiter = "\t";
+	private String uniqueIndexes = "ORIGINAL_LINE";
 	private String equalsTemplate = "= {ORIGINAL_LINE}";
 	private String insertTemplate = "+ {ORIGINAL_LINE}";
 	private String updateTemplate = "! {ORIGINAL_LINE}";
@@ -101,7 +103,8 @@ public class AppCliHandler {
 				.required(false)
 				.hasArg(true)
 				.argName(CliOptions.EQUALS_TEMPLATE.toString())
-				.desc("Template used when a line is identified as 'equals' on the <"+CliOptions.FIRST_INPUT_FILE+"> and the <"+CliOptions.SECOND_INPUT_FILE+">.\n")
+				.desc("Template used when a line is identified as 'equals' on the <"+CliOptions.FIRST_INPUT_FILE+"> and "
+						+ "the <"+CliOptions.SECOND_INPUT_FILE+">.\n")
 				.build());
 		
 		cliOptions.addOption(Option.builder(CliOptions.INSERT_TEMPLATE.getShortText())
@@ -109,7 +112,8 @@ public class AppCliHandler {
 				.required(false)
 				.hasArg(true)
 				.argName(CliOptions.INSERT_TEMPLATE.toString())
-				.desc("Template used when a line is identified as 'new', hence it does not exist on the <"+CliOptions.FIRST_INPUT_FILE+"> but exists on the <"+CliOptions.SECOND_INPUT_FILE+">.\n")
+				.desc("Template used when a line is identified as 'inserted', hence it does not exist on the "
+						+ "<"+CliOptions.FIRST_INPUT_FILE+">; but exists on the <"+CliOptions.SECOND_INPUT_FILE+">.\n")
 				.build());
 		
 		cliOptions.addOption(Option.builder(CliOptions.UPDATE_TEMPLATE.getShortText())
@@ -117,8 +121,33 @@ public class AppCliHandler {
 				.required(false)
 				.hasArg(true)
 				.argName(CliOptions.UPDATE_TEMPLATE.toString())
-				.desc("Template used when a line is identified as 'changed', hence it exist on both the <"+CliOptions.FIRST_INPUT_FILE+"> and the <"+CliOptions.SECOND_INPUT_FILE+">"
-						+ "; but it's content is not identical.\n")
+				.desc("Template used when a line is identified as 'updated', hence it exist on both the "
+						+ "<"+CliOptions.FIRST_INPUT_FILE+"> and the <"+CliOptions.SECOND_INPUT_FILE+">; but it's content is not identical.\n")
+				.build());
+
+		cliOptions.addOption(Option.builder(CliOptions.DELETE_TEMPLATE.getShortText())
+				.longOpt(CliOptions.DELETE_TEMPLATE.getLongText())
+				.required(false)
+				.hasArg(true)
+				.argName(CliOptions.DELETE_TEMPLATE.toString())
+				.desc("Template used when a line is identified as 'deleted', hence it exist on the <"+CliOptions.FIRST_INPUT_FILE+">; "
+						+ "but does not exist on the <"+CliOptions.SECOND_INPUT_FILE+">\n")
+				.build());
+
+		
+		cliOptions.addOption(Option.builder(CliOptions.UNIQUE_INDEXES.getShortText())
+				.longOpt(CliOptions.UNIQUE_INDEXES.getLongText())
+				.required(false)
+				.hasArg(true)
+				.argName(CliOptions.UNIQUE_INDEXES.toString())
+				.desc("The indexes which creates a unique identified. Differently from regular 'diff' which compares files line by line, "
+						+ "this application compares files base on unique identifiers."
+						+ "Indexes are the numerical positions (starting with 0) resulting from spliting a line with <"+ CliOptions.TEXT_DELIMITER +">. "
+						+ "Default, it will assume the entire line is the unique identified."
+						+ "\nExample:"
+						+ "\nGiven <" + CliOptions.TEXT_DELIMITER +"> = ',' when the line '1,Robert,Smith' and '1,J,Smith'."
+						+ "\n If <"+ CliOptions.UNIQUE_INDEXES +"> is 0 or 2 it will flag the two lines as 'updated'."
+						+ "\n If <"+ CliOptions.UNIQUE_INDEXES +"> is 1 it will flag the two lines as 'inserted'.")
 				.build());
 		
 		
@@ -206,7 +235,7 @@ public class AppCliHandler {
 				cliOptions, // Options
 				3, // Left pad
 				3, // Description pad
-				"\nhttps://github.com/rafasantos/misc/diff \n" // Footer
+				"\nhttps://github.com/rafasantos/difffilter \n" // Footer
 				);
 		String commandLineOutputMessage = stringWritter.toString();
 		return commandLineOutputMessage;
@@ -224,6 +253,10 @@ public class AppCliHandler {
 		return textDelimiter;
 	}
 
+	public String getUniqueIndexes() {
+		return uniqueIndexes;
+	}
+	
 	public String getUpdateTemplate() {
 		return updateTemplate;
 	}
@@ -249,39 +282,14 @@ public class AppCliHandler {
 
 	private void readOptionValues(CommandLine cli) {
 		this.textDelimiter = cli.getOptionValue(CliOptions.TEXT_DELIMITER.getShortText(), this.textDelimiter);
+		this.uniqueIndexes = cli.getOptionValue(CliOptions.UNIQUE_INDEXES.getShortText(), this.uniqueIndexes);
 		this.equalsTemplate = cli.getOptionValue(CliOptions.EQUALS_TEMPLATE.getShortText(), this.equalsTemplate);
 		this.insertTemplate = cli.getOptionValue(CliOptions.INSERT_TEMPLATE.getShortText(), this.insertTemplate);
 		this.updateTemplate = cli.getOptionValue(CliOptions.UPDATE_TEMPLATE.getShortText(), this.updateTemplate);
+		this.deleteTemplate = cli.getOptionValue(CliOptions.DELETE_TEMPLATE.getShortText(), this.deleteTemplate);
 		String firstFilePath = cli.getOptionValue(CliOptions.FIRST_INPUT_FILE.getShortText());
 		this.firstFile = new File(firstFilePath);
 		String secondFilePath = cli.getOptionValue(CliOptions.SECOND_INPUT_FILE.getShortText());
 		this.secondFile = new File(secondFilePath);
-	}
-
-	public void setDeleteTemplate(String deleteTemplate) {
-		this.deleteTemplate = deleteTemplate;
-	}
-
-	public void setEqualsTemplate(String equalsTemplate) {
-		this.equalsTemplate = equalsTemplate;
-	}
-	public void setFirstFile(File firstFile) {
-		this.firstFile = firstFile;
-	}
-
-	public void setInsertTemplate(String insertTemplate) {
-		this.insertTemplate = insertTemplate;
-	}
-	
-	public void setSecondFile(File secondFile) {
-		this.secondFile = secondFile;
-	}
-	
-	public void setTextDelimiter(String textDelimiter) {
-		this.textDelimiter = textDelimiter;
-	}
-	
-	public void setUpdateTemplate(String updateTemplate) {
-		this.updateTemplate = updateTemplate;
 	}
 }

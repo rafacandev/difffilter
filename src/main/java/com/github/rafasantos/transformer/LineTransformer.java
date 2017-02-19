@@ -13,10 +13,14 @@ public class LineTransformer {
 		result.setOriginalLine(s);
 		String[] originalLineSplitted = s.split(delimiter);
 		StringBuffer pkStringBuffer = new StringBuffer();
-		for(int i = 0; i < primaryKeys.length; i++) {
-			pkStringBuffer.append(originalLineSplitted[primaryKeys[i]]);
+		if (primaryKeys != null) {	
+			for(int i = 0; i < primaryKeys.length; i++) {
+				pkStringBuffer.append(originalLineSplitted[primaryKeys[i]]);
+			}
+			result.setPrimaryKey(pkStringBuffer.toString());
+		} else {
+			result.setPrimaryKey(s);
 		}
-		result.setPrimaryKey(pkStringBuffer.toString());
 		for (int i = 0; i < sArray.length; i++) {
 			result.addField(i, sArray[i]);
 		}

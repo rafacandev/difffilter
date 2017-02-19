@@ -45,6 +45,7 @@ public class DiffController {
 			String uniqueKeyIndexes, String delimiter, String equalsTemplate, String insertTemplate,
 			String updateTemplate, String deleteTemplate) throws IOException {
 
+		//TODO change from int[] to List<Integer>
 		int[] primaryKeys = getUniqueKeyIndexesAsInt(uniqueKeyIndexes);
 
 		Map<String, LineDelimitedPojo> leftMap = diffService.readerToMap(leftReader, primaryKeys, delimiter);
@@ -89,6 +90,9 @@ public class DiffController {
 	private int[] getUniqueKeyIndexesAsInt(String primaryKeyIndexes) {
 		int primaryKeys[] = null;
 		if (primaryKeyIndexes != null && !primaryKeyIndexes.isEmpty()) {
+			if (primaryKeyIndexes.equals("ORIGINAL_LINE")) {
+				return null;
+			}
 			String[] primaryKeyIndexesSplitted = primaryKeyIndexes.split(",");
 			primaryKeys = new int[primaryKeyIndexesSplitted.length];
 			for (int i = 0; i < primaryKeyIndexesSplitted.length; i++) {
