@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.security.InvalidParameterException;
+import java.util.Comparator;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -72,7 +73,7 @@ public class AppCliHandler {
 				.required(true)
 				.hasArg(true)
 				.argName(CliOptions.FIRST_INPUT_FILE.toString())
-				.desc("Mandatory, the file path of the first file to be compared")
+				.desc("Mandatory, the file path of the first file to be compared.\n")
 				.build());
 		
 		cliOptions.addOption(Option.builder(CliOptions.SECOND_INPUT_FILE.getShortText())
@@ -80,7 +81,7 @@ public class AppCliHandler {
 				.required(true)
 				.hasArg(true)
 				.argName(CliOptions.SECOND_INPUT_FILE.toString())
-				.desc("Mandatory, the file path of the second file to be compared")
+				.desc("Mandatory, the file path of the second file to be compared.\n")
 				.build());
 
 		cliOptions.addOption( Option.builder(CliOptions.TEXT_DELIMITER.getShortText())
@@ -91,26 +92,31 @@ public class AppCliHandler {
 				.desc("The text delimiter used in conjunction to templates (e.g.: insertTemplate, deleteTemplate...)"
 						+ "\nThe delimiter must be included when using templates with numeric index (e.g.: '{0}', etc)."
 						+ "\nOtherwise unexpected results will occur."
-						+ "\nMost common delimiters are: tab '\\t', pipe '|' and comma ','"
-						+ "\nThe default value is '\\t'."
-						+ "\nThe delimiters are matched agains java regular expression.")
+						+ "\nMost common delimiters are: tab '\\t', pipe '|' and comma ',' and the default value is '\\t'."
+						+ "\nThe delimiters are matched against java regular expression.\t\n")
+				.build());
+
+		cliOptions.addOption(Option.builder(CliOptions.INSERT_TEMPLATE.getShortText())
+				.longOpt(CliOptions.INSERT_TEMPLATE.getLongText())
+				.required(false)
+				.hasArg(true)
+				.argName(CliOptions.INSERT_TEMPLATE.toString())
+				.desc("The template used when a line is identified as 'new line'.\n")
 				.build());
 		
 		cliOptions.addOption( Option.builder(CliOptions.HELP.getShortText())
 				.longOpt(CliOptions.HELP.getLongText())
 				.required(false)
 				.hasArg(false)
-				.desc("Display help information")
+				.desc("Display help information.\n")
 				.build());
-
+		
 		try {
 			isHelp = handleHelp(arguments);
 			if (!isHelp) {
+				
 				CommandLine cli = new DefaultParser().parse(cliOptions, arguments);
-				String firstFilePath = cli.getOptionValue(CliOptions.FIRST_INPUT_FILE.getShortText());
-				this.firstFile = new File(firstFilePath);
-				String secondFilePath = cli.getOptionValue(CliOptions.SECOND_INPUT_FILE.getShortText());
-				this.secondFile = new File(secondFilePath);
+				readOptionValues(cli);
 				if (!firstFile.exists() || !secondFile.exists()) {
 					if (!this.firstFile.exists()) {
 						throw new FileNotFoundException("First file does not exist: " + firstFile.getAbsolutePath());
@@ -134,6 +140,26 @@ public class AppCliHandler {
 		}
 	}
 
+	private Comparator<Option> getDefaultHelpFormatterComparator() {
+		Comparator<Option> defaultHelpOrder = (Option o1, Option o2) -> {
+			if (CliOptions.HELP.toString().equals(o1.getArgName())) {
+				return 1000;
+			} else if (CliOptions.FIRST_INPUT_FILE.toString().equals(o1.getArgName())) {
+				return 100;
+			} else if (CliOptions.SECOND_INPUT_FILE.toString().equals(o1.getArgName())) {
+				return 90;
+			} else if (CliOptions.TEXT_DELIMITER.toString().equals(o1.getArgName())) {
+				return 80;
+			} else if (CliOptions.EQUALS_TEMPLATE.toString().equals(o1.getArgName())) {
+				return 70;
+			} else if (CliOptions.INSERT_TEMPLATE.toString().equals(o1.getArgName())) {
+				return 60;
+			}
+			return -1;
+		};
+		return defaultHelpOrder;
+	}
+
 	public String getDeleteTemplate() {
 		return deleteTemplate;
 	}
@@ -146,6 +172,28 @@ public class AppCliHandler {
 		return firstFile;
 	}
 
+	/**
+	 * Return a string with the command line help
+	 * @return help as string
+	 */
+	public String getHelpText() {
+		StringWriter stringWritter = new StringWriter();
+		PrintWriter printWritter = new PrintWriter(stringWritter);
+		HelpFormatter formatter = new HelpFormatter();
+		formatter.setOptionComparator(getDefaultHelpFormatterComparator());
+		formatter.printHelp(printWritter, 
+				150, // Width
+				"java -jar <THIS_JAR.jar> -ff=<"+CliOptions.FIRST_INPUT_FILE+"> -sf=<"+CliOptions.SECOND_INPUT_FILE+"> \n\n", // Usage
+				"Diff and Filter command line help:\n", // Header 
+				cliOptions, // Options
+				3, // Left pad
+				3, // Description pad
+				"\nhttps://github.com/rafasantos/misc/diff \n" // Footer
+				);
+		String commandLineOutputMessage = stringWritter.toString();
+		return commandLineOutputMessage;
+	}
+
 	public String getInsertTemplate() {
 		return insertTemplate;
 	}
@@ -153,21 +201,13 @@ public class AppCliHandler {
 	public File getSecondFile() {
 		return secondFile;
 	}
-
+	
 	public String getTextDelimiter() {
 		return textDelimiter;
 	}
-	
+
 	public String getUpdateTemplate() {
 		return updateTemplate;
-	}
-
-	/**
-	 * If is a help command line (e.g.: -h)
-	 * @return
-	 */
-	public boolean isHelp() {
-		return this.isHelp;
 	}
 	
 	private boolean handleHelp(String[] arguments) throws ParseException {
@@ -182,24 +222,20 @@ public class AppCliHandler {
 	}
 
 	/**
-	 * Return a string with the command line help
-	 * @return help as string
+	 * If is a help command line (e.g.: -h)
+	 * @return
 	 */
-	public String getHelpText() {
-		StringWriter stringWritter = new StringWriter();
-		PrintWriter printWritter = new PrintWriter(stringWritter);
-		HelpFormatter formatter = new HelpFormatter();
-		formatter.printHelp(printWritter, 
-				150, // Width
-				"java -jar <THIS_JAR.jar> -ff=<"+CliOptions.FIRST_INPUT_FILE+"> -sf=<"+CliOptions.SECOND_INPUT_FILE+"> \n\n", // Usage
-				"Diff and Filter command line help:\n", // Header 
-				cliOptions, // Options
-				3, // Left pad
-				3, // Description pad
-				"\nhttps://github.com/rafasantos/misc/diff \n" // Footer
-				);
-		String commandLineOutputMessage = stringWritter.toString();
-		return commandLineOutputMessage;
+	public boolean isHelp() {
+		return this.isHelp;
+	}
+
+	private void readOptionValues(CommandLine cli) {
+		this.textDelimiter = cli.getOptionValue(CliOptions.TEXT_DELIMITER.getShortText(), this.textDelimiter);
+		this.insertTemplate = cli.getOptionValue(CliOptions.INSERT_TEMPLATE.getShortText(), this.insertTemplate);
+		String firstFilePath = cli.getOptionValue(CliOptions.FIRST_INPUT_FILE.getShortText());
+		this.firstFile = new File(firstFilePath);
+		String secondFilePath = cli.getOptionValue(CliOptions.SECOND_INPUT_FILE.getShortText());
+		this.secondFile = new File(secondFilePath);
 	}
 
 	public void setDeleteTemplate(String deleteTemplate) {

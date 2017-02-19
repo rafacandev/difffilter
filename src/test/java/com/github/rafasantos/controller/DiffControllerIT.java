@@ -13,7 +13,7 @@ import org.junit.Test;
 import com.github.rafasantos.context.ContextProvider;
 import com.github.rafasantos.pojo.LinePojo;
 
-public class FileControllerIT {
+public class DiffControllerIT {
 	
 	private DiffController fixture = ContextProvider.getDiffController();
 	
@@ -78,7 +78,7 @@ public class FileControllerIT {
 		String primaryKeyIndexes = "0";
 		
 		// Run
-		List<LinePojo> response= fixture.getDiff(beforeReader, afterReader, primaryKeyIndexes, equalsTemplate, insertTemplate, updateTemplate, deleteTemplate);
+		List<LinePojo> response= fixture.getDiff(beforeReader, afterReader, primaryKeyIndexes, "\t", equalsTemplate, insertTemplate, updateTemplate, deleteTemplate);
 		
 		StringBuffer result = new StringBuffer();
 		for (LinePojo l : response) {

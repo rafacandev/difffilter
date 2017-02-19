@@ -42,13 +42,13 @@ public class DiffController {
 	 * @throws IOException
 	 */
 	public List<LinePojo> getDiff(BufferedReader leftReader, BufferedReader rightReader,
-			String uniqueKeyIndexes, String equalsTemplate, String insertTemplate,
+			String uniqueKeyIndexes, String delimiter, String equalsTemplate, String insertTemplate,
 			String updateTemplate, String deleteTemplate) throws IOException {
 
 		int[] primaryKeys = getUniqueKeyIndexesAsInt(uniqueKeyIndexes);
 
-		Map<String, LineDelimitedPojo> leftMap = diffService.readerToMap(leftReader, primaryKeys);
-		Map<String, LineDelimitedPojo> rightMap = diffService.readerToMap(rightReader, primaryKeys);
+		Map<String, LineDelimitedPojo> leftMap = diffService.readerToMap(leftReader, primaryKeys, delimiter);
+		Map<String, LineDelimitedPojo> rightMap = diffService.readerToMap(rightReader, primaryKeys, delimiter);
 
 		Set<LineDelimitedPojo> diffSet = diffService.getDiff(leftMap, rightMap);
 

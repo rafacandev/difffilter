@@ -74,12 +74,12 @@ public class DiffService {
 	 * @return
 	 * @throws IOException
 	 */
-	public Map<String, LineDelimitedPojo> readerToMap(BufferedReader reader, int[] primaryKeys) throws IOException {
+	public Map<String, LineDelimitedPojo> readerToMap(BufferedReader reader, int[] primaryKeys, String delimiter) throws IOException {
 		Map<String, LineDelimitedPojo> result = new LinkedHashMap<>();
 		String lineString;
 		long lineNumber = 1;
 		while ((lineString = reader.readLine()) != null) {
-			LineDelimitedPojo l = this.transformer.transform(lineString, lineNumber, primaryKeys);
+			LineDelimitedPojo l = this.transformer.transform(lineString, lineNumber, primaryKeys, delimiter);
 			result.put(l.getPrimaryKey(), l);
 			lineNumber++;
 		}

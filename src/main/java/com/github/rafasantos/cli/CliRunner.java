@@ -25,7 +25,7 @@ public class CliRunner {
 			BufferedReader firstFileReader = new BufferedReader(new InputStreamReader(ffis));
 			sfis = new FileInputStream(cli.getSecondFile());
 			BufferedReader secondFileReader = new BufferedReader(new InputStreamReader(sfis));
-			response = fileController.getDiff(firstFileReader, secondFileReader, "0,1", cli.getEqualsTemplate(),
+			response = fileController.getDiff(firstFileReader, secondFileReader, "0,1", cli.getTextDelimiter(), cli.getEqualsTemplate(),
 					cli.getInsertTemplate(), cli.getUpdateTemplate(), cli.getDeleteTemplate());
 
 		} catch (FileNotFoundException e) {
