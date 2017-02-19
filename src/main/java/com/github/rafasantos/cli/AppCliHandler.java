@@ -34,7 +34,7 @@ public class AppCliHandler {
 		TEXT_DELIMITER("textDelimiter", "td"), 
 		EQUALS_TEMPLATE("equalsTemplate", "et"),
 		INSERT_TEMPLATE("insertTemplate", "it"),
-		UPDATE_TEMPATE("updateTemplate", "ut"),
+		UPDATE_TEMPLATE("updateTemplate", "ut"),
 		DELETE_TEMPLATE("deleteTemplate", "dt");
 
 		private final String longText;
@@ -101,7 +101,7 @@ public class AppCliHandler {
 				.required(false)
 				.hasArg(true)
 				.argName(CliOptions.EQUALS_TEMPLATE.toString())
-				.desc("The template used when a line is identified as 'new line'.\n")
+				.desc("Template used when a line is identified as 'equals' on the <"+CliOptions.FIRST_INPUT_FILE+"> and the <"+CliOptions.SECOND_INPUT_FILE+">.\n")
 				.build());
 		
 		cliOptions.addOption(Option.builder(CliOptions.INSERT_TEMPLATE.getShortText())
@@ -109,8 +109,18 @@ public class AppCliHandler {
 				.required(false)
 				.hasArg(true)
 				.argName(CliOptions.INSERT_TEMPLATE.toString())
-				.desc("The template used when a line is identified as 'new line'.\n")
+				.desc("Template used when a line is identified as 'new', hence it does not exist on the <"+CliOptions.FIRST_INPUT_FILE+"> but exists on the <"+CliOptions.SECOND_INPUT_FILE+">.\n")
 				.build());
+		
+		cliOptions.addOption(Option.builder(CliOptions.UPDATE_TEMPLATE.getShortText())
+				.longOpt(CliOptions.UPDATE_TEMPLATE.getLongText())
+				.required(false)
+				.hasArg(true)
+				.argName(CliOptions.UPDATE_TEMPLATE.toString())
+				.desc("Template used when a line is identified as 'changed', hence it exist on both the <"+CliOptions.FIRST_INPUT_FILE+"> and the <"+CliOptions.SECOND_INPUT_FILE+">"
+						+ "; but it's content is not identical.\n")
+				.build());
+		
 		
 		cliOptions.addOption( Option.builder(CliOptions.HELP.getShortText())
 				.longOpt(CliOptions.HELP.getLongText())
@@ -241,6 +251,7 @@ public class AppCliHandler {
 		this.textDelimiter = cli.getOptionValue(CliOptions.TEXT_DELIMITER.getShortText(), this.textDelimiter);
 		this.equalsTemplate = cli.getOptionValue(CliOptions.EQUALS_TEMPLATE.getShortText(), this.equalsTemplate);
 		this.insertTemplate = cli.getOptionValue(CliOptions.INSERT_TEMPLATE.getShortText(), this.insertTemplate);
+		this.updateTemplate = cli.getOptionValue(CliOptions.UPDATE_TEMPLATE.getShortText(), this.updateTemplate);
 		String firstFilePath = cli.getOptionValue(CliOptions.FIRST_INPUT_FILE.getShortText());
 		this.firstFile = new File(firstFilePath);
 		String secondFilePath = cli.getOptionValue(CliOptions.SECOND_INPUT_FILE.getShortText());
