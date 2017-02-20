@@ -10,12 +10,13 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.rafasantos.context.ContextProvider;
+import com.github.rafasantos.context.AppContextTesting;
 import com.github.rafasantos.pojo.LinePojo;
 
 public class DiffControllerIT {
 	
-	private DiffController fixture = ContextProvider.getDiffController();
+	private AppContextTesting ac = new AppContextTesting();
+	private DiffController fixture = ac.getBean(DiffController.class);
 	
 	private static final String beforeInputString = 
 			  "1	Alpha	one\n"

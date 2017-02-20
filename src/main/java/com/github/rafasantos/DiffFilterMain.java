@@ -2,7 +2,8 @@ package com.github.rafasantos;
 
 import com.github.rafasantos.cli.AppCliHandler;
 import com.github.rafasantos.cli.CliRunner;
-import com.github.rafasantos.context.ContextProvider;
+import com.github.rafasantos.context.AppContext;
+import com.github.rafasantos.context.AppContextEagerlyLoaded;
 import com.github.rafasantos.ui.ConsoleUi;
 
 /**
@@ -14,14 +15,21 @@ import com.github.rafasantos.ui.ConsoleUi;
  */
 public class DiffFilterMain {
 	
-	private static ConsoleUi ui = new ConsoleUi();
+	private ConsoleUi ui;
+	CliRunner cliRunner;
 	
+	public DiffFilterMain(AppContext applicationContext) {
+		ui = applicationContext.getBean(ConsoleUi.class);
+		cliRunner = applicationContext.getBean(CliRunner.class); 
+	}
+
 	public static void main(String[] arguments) {
-		DiffFilterMain mainInstance = new DiffFilterMain();
-		mainInstance.run(arguments);
+		AppContext applicationContext = AppContextEagerlyLoaded.getInstance();
+		DiffFilterMain mainInstance = new DiffFilterMain(applicationContext);
+		mainInstance.run(arguments, applicationContext);
 	}
 	
-	public void run(String[] arguments) {
+	public void run(String[] arguments, AppContext applicationContext) {
 		try {
 			AppCliHandler cli = null;
 			ui.initUi();
@@ -40,7 +48,7 @@ public class DiffFilterMain {
 				ui.print(cli.getHelpText());
 			} else {
 				// Proceed normally
-				CliRunner cliRunner = ContextProvider.getCliRunner();
+				
 				cliRunner.run(cli);
 			}
 		} catch (Exception e) {
@@ -51,7 +59,8 @@ public class DiffFilterMain {
 		}
 	}
 	
-	public static void setUi(ConsoleUi consoleUi) {
-		ui = consoleUi;
+	public ConsoleUi getUi() {
+		return ui;
 	}
+	
 }

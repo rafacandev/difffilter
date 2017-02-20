@@ -6,39 +6,21 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.github.rafasantos.DiffFilterMain;
+import com.github.rafasantos.context.AppContextTesting;
 import com.github.rafasantos.ui.ConsoleUi;
+import com.github.rafasantos.ui.MockConsoleUi;
 
 public class DiffFilterMainIT {
 	
-	private DiffFilterMain fixture = new DiffFilterMain();
-	
-	private class MockConsoleUi extends ConsoleUi {
-		public StringBuffer output = new StringBuffer();
-		@Override
-		public void print(String s) {
-			output.append(s);
-		}
-		@Override
-		public void printGreen(String s) {
-			print(s);
-		}
-		@Override
-		public void printRed(String s) {
-			print(s);
-		}
-		@Override
-		public void printYellow(String s) {
-			print(s);
-		}
-	}
+	private AppContextTesting ac = new AppContextTesting();
+	private DiffFilterMain fixture = new DiffFilterMain(ac);
 	
 	@Test
 	public void helpInfo() {
-		MockConsoleUi mockUi = new MockConsoleUi();
-		DiffFilterMain.setUi(mockUi);
 		String[] arguments = {"-h"};
-		fixture.run(arguments);
-		Assert.assertTrue(mockUi.output.toString().contains("--help"));
+		fixture.run(arguments, ac);
+		MockConsoleUi ui = (MockConsoleUi) ac.getBean(ConsoleUi.class);
+		Assert.assertTrue(ui.output.toString().contains("--help"));
 	}
 	
 	@Test
@@ -46,7 +28,24 @@ public class DiffFilterMainIT {
 		URL firstFile = this.getClass().getClassLoader().getResource("first-file.tsv");
 		URL secondFile = this.getClass().getClassLoader().getResource("second-file.tsv");
 		String[] arguments = {"-ff", firstFile.getPath(), "-sf", secondFile.getPath()};
-		fixture.run(arguments);
+		fixture.run(arguments, ac);
+
+		String expected = 
+				 "= 1	Alpha	one" + "\n"
+				+"= 2	Beta	two" + "\n"
+				+"- 3	Charlie	three" + "\n"
+				+"+ 3	Charlie-updated	three" + "\n"
+				+"- 10	Japan	ten" + "\n"
+				+"+ 4	Delta	four" + "\n"
+				+"- 5	Echo	five" + "\n"
+				+"+ 10	Japan	ten-updated" + "\n"
+				+"= 6	Foxtrot	six" + "\n"
+				+"+ 8	Hotel	eight" + "\n"
+				+"- 9	India	nine " + "\n"
+				+"= 7	Gamma	seven" + "\n";
+		
+		MockConsoleUi ui = (MockConsoleUi) ac.getBean(ConsoleUi.class);
+		Assert.assertEquals(expected, ui.output.toString());
 	}
 	
 }

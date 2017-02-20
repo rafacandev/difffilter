@@ -7,15 +7,20 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
-import com.github.rafasantos.context.ContextProvider;
+import com.github.rafasantos.context.AppContext;
 import com.github.rafasantos.controller.DiffController;
 import com.github.rafasantos.pojo.LinePojo;
 import com.github.rafasantos.ui.ConsoleUi;
 
 public class CliRunner {
 
-	private DiffController fileController = ContextProvider.getDiffController();
-	private ConsoleUi ui = ContextProvider.getConsoleUi();
+	private DiffController diffController;
+	private ConsoleUi ui;
+	
+	public CliRunner(AppContext applicationContext) {
+		 ui = applicationContext.getBean(ConsoleUi.class);
+		 diffController = applicationContext.getBean(DiffController.class);
+	}
 
 	public void run(AppCliHandler cli) {
 		FileInputStream ffis = null;
@@ -26,7 +31,7 @@ public class CliRunner {
 			BufferedReader firstFileReader = new BufferedReader(new InputStreamReader(ffis));
 			sfis = new FileInputStream(cli.getSecondFile());
 			BufferedReader secondFileReader = new BufferedReader(new InputStreamReader(sfis));
-			response = fileController.getDiff(firstFileReader, secondFileReader, cli.getUniqueIndexes(), cli.getTextDelimiter(), cli.getEqualsTemplate(),
+			response = diffController.getDiff(firstFileReader, secondFileReader, cli.getUniqueIndexes(), cli.getTextDelimiter(), cli.getEqualsTemplate(),
 					cli.getInsertTemplate(), cli.getUpdateTemplate(), cli.getDeleteTemplate());
 
 		} catch (FileNotFoundException e) {

@@ -3,10 +3,7 @@ package com.github.rafasantos.cli;
 import java.io.FileNotFoundException;
 import java.net.URL;
 
-import org.junit.Assert;
 import org.junit.Test;
-
-import com.github.rafasantos.cli.AppCliHandler;
 
 public class AppCliHandlerIT {
 	
