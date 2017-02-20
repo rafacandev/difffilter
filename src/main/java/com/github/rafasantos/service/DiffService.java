@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.github.rafasantos.context.AppContext;
 import com.github.rafasantos.pojo.LineDelimitedPojo;
 import com.github.rafasantos.pojo.LinePojo;
 import com.github.rafasantos.transformer.LineTransformer;
@@ -22,8 +23,8 @@ public class DiffService {
 	
 	private LineTransformer transformer;
 
-	public DiffService(LineTransformer linetransformer) {
-		this.transformer = linetransformer;
+	public DiffService(AppContext appContext) {
+		transformer = appContext.getBean(LineTransformer.class);
 	}
 
 	/**

@@ -12,29 +12,15 @@ import com.github.rafasantos.ui.ConsoleUi;
 public class AppContextEagerlyLoaded implements AppContext {
 
 	private static final AppContextEagerlyLoaded instance = new AppContextEagerlyLoaded();
-	private static LineTransformer lineTransformer;
-	private static DiffService diffService;
-	private static DiffController diffController;
-	private static ConsoleUi consoleUi;
-	private static CliExecutor cliRunner;
 	private static Map<String, Object> beans = new HashMap<>();
 	
 	static {
-		// Do not change the order of these static fields. As some objects need to be instantiated before others.
-		lineTransformer = new LineTransformer();
-		beans.put(lineTransformer.getClass().getSimpleName(), lineTransformer);
-		
-		diffService = new DiffService(lineTransformer);
-		beans.put(diffService.getClass().getSimpleName(), diffService);
-		
-		diffController = new DiffController(diffService);
-		beans.put(diffController.getClass().getSimpleName(), diffController);
-		
-		consoleUi = new ConsoleUi();
-		beans.put(consoleUi .getClass().getSimpleName(), consoleUi );
-		
-		cliRunner = new CliExecutor(getInstance());
-		beans.put(cliRunner .getClass().getSimpleName(), cliRunner );
+		// Be careful when changing the order of these static fields. As some objects need to be instantiated before others.
+		beans.put(LineTransformer.class.getSimpleName(), new LineTransformer());
+		beans.put(DiffService.class.getSimpleName(), new DiffService(getInstance()));
+		beans.put(DiffController.class.getSimpleName(), new DiffController(getInstance()));
+		beans.put(ConsoleUi.class.getSimpleName(), new ConsoleUi());
+		beans.put(CliExecutor.class.getSimpleName(), new CliExecutor(getInstance()) );
 	}
 	
 	/**

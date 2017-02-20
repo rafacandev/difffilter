@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.github.rafasantos.context.AppContext;
 import com.github.rafasantos.formarter.LinePojoFormatter;
 import com.github.rafasantos.pojo.LineDelimitedPojo;
 import com.github.rafasantos.pojo.LinePojo;
@@ -24,8 +25,12 @@ public class DiffController {
 
 	private DiffService diffService;
 
-	public DiffController(DiffService diffService) {
-		this.diffService = diffService;
+	/**
+	 * Constructor which wires dependencies provided by {@code applicationContext}.
+	 * @param applicationContext
+	 */
+	public DiffController(AppContext appContext) {
+		diffService = appContext.getBean(DiffService.class);
 	}
 
 	/**
