@@ -14,7 +14,10 @@ public class LinePojoFormatter {
 	public static String formatTemplate(String template, LineDelimitedPojo p) {
 		Set<String> matches = findMatches(template);
 		for (String s : matches) {
-			if (AppConstants.ORIGINAL_LINE.equals(s)) {
+			if (AppConstants.IGNORE_LINE.equals(s)) {
+				template = "";
+				return null;
+			} else if (AppConstants.ORIGINAL_LINE.equals(s)) {
 				template = template.replace("{" + s + "}", p.getOriginalLine());
 			} else {
 				String value = "";
@@ -37,10 +40,11 @@ public class LinePojoFormatter {
 		Set<String> result = new HashSet<>();
 		if (template != null) {
 			String s = template;
-			Pattern p = Pattern.compile("\\{\\d+\\}|"+AppConstants.ORIGINAL_LINE);
+			Pattern p = Pattern.compile("\\{\\d+\\}|"+AppConstants.ORIGINAL_LINE +"|"+AppConstants.IGNORE_LINE);
 			Matcher m = p.matcher(template);
 			while (m.find()) {
-				if (AppConstants.ORIGINAL_LINE.equals(s.substring(m.start(), m.end()))) {
+				if (AppConstants.ORIGINAL_LINE.equals(s.substring(m.start(), m.end()))
+						|| AppConstants.IGNORE_LINE.equals(s.substring(m.start(), m.end()))) {
 					result.add(s.substring(m.start(), m.end()));
 				} else {
 					int startMatcher = m.start() + 1;

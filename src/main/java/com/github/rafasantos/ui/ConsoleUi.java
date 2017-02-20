@@ -21,20 +21,26 @@ public class ConsoleUi {
 		AnsiConsole.systemInstall();
 	}
 	
-	public void print(String s) {
-		Printer.print(s);
+	public void println(String s) {
+		Printer.println(s);
 	}
 	
 	public void printGreen(String s) {
-		Printer.print(ansi().fg(Color.GREEN).a(s).reset());
+		if (s != null) {
+			Printer.println(ansi().fg(Color.GREEN).a(s).reset());
+		}
 	}
 	
 	public void printRed(String s) {
-		Printer.print(ansi().fg(RED).a(s).reset());
+		if (s != null) {
+			Printer.println(ansi().fg(RED).a(s).reset());
+		}
 	}
 	
 	public void printYellow(String s) {
-		Printer.print(ansi().fg(Color.YELLOW).a(s).reset());
+		if (s != null) {
+			Printer.println(ansi().fg(Color.YELLOW).a(s).reset());
+		}
 	}
 	
 }

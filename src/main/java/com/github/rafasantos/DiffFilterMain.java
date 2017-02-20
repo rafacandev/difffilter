@@ -55,12 +55,12 @@ public class DiffFilterMain {
 				cli = new AppCliHandler(arguments);
 			} catch (Throwable t) {
 				ui.printRed("Not able to start application! " + t.getMessage());
-				ui.print("Exiting the application with error code [1]. Not able to process command line options.");
+				ui.println("Exiting the application with error code [1]. Not able to process command line options.");
 				System.exit(1);
 			}
 			// If command line is asking for help, display the help menu 
 			if (cli.isHelp()) {
-				ui.print(cli.getHelpText());
+				ui.println(cli.getHelpText());
 			} else {
 				// Proceed normally
 				cliRunner.execute(cli);

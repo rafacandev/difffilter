@@ -8,10 +8,12 @@ import java.io.InputStreamReader;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.github.rafasantos.context.AppContextTesting;
 import com.github.rafasantos.pojo.LinePojo;
+import com.github.rafasantos.util.AppConstants;
 
 public class DiffControllerIT {
 	
@@ -83,11 +85,42 @@ public class DiffControllerIT {
 		
 		StringBuffer result = new StringBuffer();
 		for (LinePojo l : response) {
-			result.append(l.getDiffText());
+			if (l.getDiffText() != null) {
+				result.append(l.getDiffText() + "\n");
+			}
 		}
 		
 		// Assert
 		Assert.assertEquals(expectedOutputString, result.toString());
+	}
+	
+	
+	@Test
+	public void ignoredTemplate() throws IOException {
+		// Setup
+		String beforeString = "FIRST\nSECOND\nTHIRD\n";
+		String afterString = "FIRST\nTHIRD\n";
+		InputStream beforeInputStream = new ByteArrayInputStream(beforeString.getBytes());
+		BufferedReader beforeReader = new BufferedReader(new InputStreamReader(beforeInputStream));
+		InputStream afterInputStream = new ByteArrayInputStream(afterString.getBytes());
+		BufferedReader afterReader = new BufferedReader(new InputStreamReader(afterInputStream));
+
+		// Run
+		List<LinePojo> response= fixture.getDiff(beforeReader, afterReader, "0", "\t",
+				"{"+AppConstants.ORIGINAL_LINE+"}",
+				"{"+AppConstants.ORIGINAL_LINE+"}",
+				"{"+AppConstants.ORIGINAL_LINE+"}",
+				"{"+AppConstants.IGNORE_LINE+"}");
+		
+		StringBuffer result = new StringBuffer();
+		for (LinePojo l : response) {
+			if (l.getDiffText() != null) {
+				result.append(l.getDiffText() + "\n");
+			}
+		}
+		
+		// Assert
+		Assert.assertEquals(afterString, result.toString());
 	}
 	
 }

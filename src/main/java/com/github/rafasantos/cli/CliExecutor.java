@@ -72,7 +72,7 @@ public class CliExecutor {
 			} else if (l.getDiffType() == LinePojo.DiffType.INSERTED) {
 				ui.printGreen(l.getDiffText());
 			} else {
-				ui.print(l.getDiffText());
+				ui.println(l.getDiffText());
 			}
 		}
 		

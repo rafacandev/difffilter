@@ -75,16 +75,16 @@ public class DiffController {
 		String result = new String();
 		switch (l.getDiffType()) {
 		case EQUALS:
-			result = LinePojoFormatter.formatTemplate(equalsTemplate, l) + "\n";
+			result = LinePojoFormatter.formatTemplate(equalsTemplate, l);
 			break;
 		case INSERTED:
-			result = LinePojoFormatter.formatTemplate(insertTemplate, l) + "\n";
+			result = LinePojoFormatter.formatTemplate(insertTemplate, l);
 			break;
 		case UPDATED:
-			result = LinePojoFormatter.formatTemplate(updateTemplate, l) + "\n";
+			result = LinePojoFormatter.formatTemplate(updateTemplate, l);
 			break;
 		case DELETED:
-			result = LinePojoFormatter.formatTemplate(deleteTemplate, l) + "\n";
+			result = LinePojoFormatter.formatTemplate(deleteTemplate, l);
 			break;
 		default:
 			break;

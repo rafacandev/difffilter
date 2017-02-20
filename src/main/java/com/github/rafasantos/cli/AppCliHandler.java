@@ -14,6 +14,8 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import com.github.rafasantos.util.AppConstants;
+
 /**
  * Handles command line options including default options and capturing command line arguments.
  * @author rafael.santos.bra@gmail.com
@@ -224,6 +226,17 @@ public class AppCliHandler {
 	 * @return help as string
 	 */
 	public String getHelpText() {
+		
+		
+		String header = ""
+				+ "=== SUMMARY ==="
+				+ "Outputs the differences between --firstFile and --secondFile."
+				+ "Additionally, it is capable to apply templates and indicate the unique indexes used during the comparison."
+				+ ""
+				+ "=== TEMPLATES ==="
+				+ "Templates allow you to change the output of the comparison. The supported templates are: --equalsTemplate, --insertTemplate, --updateTemplate, --deleteTemplate."
+				+ "Values between curly brackets will be replaced by they split indexes. The special flag {"+AppConstants.ORIGINAL_LINE+"} is replaced by the original text."
+				+ "The special flag {"+AppConstants.IGNORE_LINE+"} indicates that lines should not be output.";
 		StringWriter stringWritter = new StringWriter();
 		PrintWriter printWritter = new PrintWriter(stringWritter);
 		HelpFormatter formatter = new HelpFormatter();
@@ -231,7 +244,7 @@ public class AppCliHandler {
 		formatter.printHelp(printWritter, 
 				150, // Width
 				"java -jar <THIS_JAR.jar> -ff=<"+CliOptions.FIRST_INPUT_FILE+"> -sf=<"+CliOptions.SECOND_INPUT_FILE+"> \n\n", // Usage
-				"Diff and Filter command line help:\n", // Header 
+				header,
 				cliOptions, // Options
 				3, // Left pad
 				3, // Description pad
