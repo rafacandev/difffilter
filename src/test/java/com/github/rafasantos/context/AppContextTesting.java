@@ -3,7 +3,7 @@ package com.github.rafasantos.context;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.github.rafasantos.cli.CliRunner;
+import com.github.rafasantos.cli.CliExecutor;
 import com.github.rafasantos.ui.ConsoleUi;
 import com.github.rafasantos.ui.MockConsoleUi;
 
@@ -16,7 +16,7 @@ public class AppContextTesting implements AppContext {
 		// Using MockConsoleUi instead of ConsoleUi
 		beans.put(ConsoleUi.class.getSimpleName(), new MockConsoleUi());
 		// Re-register CliRunner as it depends on ConsoleUi
-		beans.put(CliRunner.class.getSimpleName(), new CliRunner(this));
+		beans.put(CliExecutor.class.getSimpleName(), new CliExecutor(this));
 	}
 
 	@Override

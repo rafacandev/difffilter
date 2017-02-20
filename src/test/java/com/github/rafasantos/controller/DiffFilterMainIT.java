@@ -18,7 +18,7 @@ public class DiffFilterMainIT {
 	@Test
 	public void helpInfo() {
 		String[] arguments = {"-h"};
-		fixture.run(arguments, ac);
+		fixture.execute(arguments, ac);
 		MockConsoleUi ui = (MockConsoleUi) ac.getBean(ConsoleUi.class);
 		Assert.assertTrue(ui.output.toString().contains("--help"));
 	}
@@ -28,7 +28,7 @@ public class DiffFilterMainIT {
 		URL firstFile = this.getClass().getClassLoader().getResource("first-file.tsv");
 		URL secondFile = this.getClass().getClassLoader().getResource("second-file.tsv");
 		String[] arguments = {"-ff", firstFile.getPath(), "-sf", secondFile.getPath()};
-		fixture.run(arguments, ac);
+		fixture.execute(arguments, ac);
 
 		String expected = 
 				 "= 1	Alpha	one" + "\n"

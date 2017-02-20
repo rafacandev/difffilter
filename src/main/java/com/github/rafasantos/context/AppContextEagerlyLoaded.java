@@ -3,7 +3,7 @@ package com.github.rafasantos.context;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.github.rafasantos.cli.CliRunner;
+import com.github.rafasantos.cli.CliExecutor;
 import com.github.rafasantos.controller.DiffController;
 import com.github.rafasantos.service.DiffService;
 import com.github.rafasantos.transformer.LineTransformer;
@@ -16,7 +16,7 @@ public class AppContextEagerlyLoaded implements AppContext {
 	private static DiffService diffService;
 	private static DiffController diffController;
 	private static ConsoleUi consoleUi;
-	private static CliRunner cliRunner;
+	private static CliExecutor cliRunner;
 	private static Map<String, Object> beans = new HashMap<>();
 	
 	static {
@@ -33,7 +33,7 @@ public class AppContextEagerlyLoaded implements AppContext {
 		consoleUi = new ConsoleUi();
 		beans.put(consoleUi .getClass().getSimpleName(), consoleUi );
 		
-		cliRunner = new CliRunner(getInstance());
+		cliRunner = new CliExecutor(getInstance());
 		beans.put(cliRunner .getClass().getSimpleName(), cliRunner );
 	}
 	

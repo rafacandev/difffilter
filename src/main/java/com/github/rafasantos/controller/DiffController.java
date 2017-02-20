@@ -29,7 +29,7 @@ public class DiffController {
 	}
 
 	/**
-	 * Get the diff between the {@code leftReader} and the {@code rightReader} applying the 
+	 * Get the {@code List<LinePojo>} containing differences between the {@code leftReader} and the {@code rightReader} applying the 
 	 * corresponding templates.
 	 * @param leftReader
 	 * @param rightReader

@@ -2,27 +2,36 @@ package com.github.rafasantos.cli;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
 import com.github.rafasantos.context.AppContext;
 import com.github.rafasantos.controller.DiffController;
+import com.github.rafasantos.exception.DiffFilterException;
 import com.github.rafasantos.pojo.LinePojo;
 import com.github.rafasantos.ui.ConsoleUi;
 
-public class CliRunner {
+public class CliExecutor {
 
 	private DiffController diffController;
 	private ConsoleUi ui;
 	
-	public CliRunner(AppContext applicationContext) {
+	/**
+	 * Constructor which wires dependencies provided by {@code applicationContext}.
+	 * @param applicationContext
+	 */
+	public CliExecutor(AppContext applicationContext) {
 		 ui = applicationContext.getBean(ConsoleUi.class);
 		 diffController = applicationContext.getBean(DiffController.class);
 	}
 
-	public void run(AppCliHandler cli) {
+	/**
+	 * Executes the <i>difffilter</i> based on the command line options.
+	 * @param cli containing the desired command line options
+	 * @throws DiffFilterException
+	 */
+	public void execute(AppCliHandler cli) throws DiffFilterException {
 		FileInputStream ffis = null;
 		FileInputStream sfis = null;
 		List<LinePojo> response = null;
@@ -31,15 +40,17 @@ public class CliRunner {
 			BufferedReader firstFileReader = new BufferedReader(new InputStreamReader(ffis));
 			sfis = new FileInputStream(cli.getSecondFile());
 			BufferedReader secondFileReader = new BufferedReader(new InputStreamReader(sfis));
-			response = diffController.getDiff(firstFileReader, secondFileReader, cli.getUniqueIndexes(), cli.getTextDelimiter(), cli.getEqualsTemplate(),
-					cli.getInsertTemplate(), cli.getUpdateTemplate(), cli.getDeleteTemplate());
-
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			response = diffController.getDiff(
+					firstFileReader,
+					secondFileReader,
+					cli.getUniqueIndexes(),
+					cli.getTextDelimiter(),
+					cli.getEqualsTemplate(),
+					cli.getInsertTemplate(),
+					cli.getUpdateTemplate(),
+					cli.getDeleteTemplate());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new DiffFilterException(e.getMessage());
 		} finally {
 			try {
 				if (ffis != null) {
@@ -49,8 +60,7 @@ public class CliRunner {
 					sfis.close();
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new DiffFilterException(e.getMessage());
 			}
 		}
 		
