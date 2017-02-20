@@ -15,6 +15,7 @@ import com.github.rafasantos.ui.ConsoleUi;
 public class CliRunner {
 
 	private DiffController fileController = ContextProvider.getDiffController();
+	private ConsoleUi ui = ContextProvider.getConsoleUi();
 
 	public void run(AppCliHandler cli) {
 		FileInputStream ffis = null;
@@ -50,13 +51,13 @@ public class CliRunner {
 		
 		for(LinePojo l : response) {
 			if (l.getDiffType() == LinePojo.DiffType.DELETED) {
-				ConsoleUi.printRed(l.getDiffText());
+				ui.printRed(l.getDiffText());
 			} else if (l.getDiffType() == LinePojo.DiffType.UPDATED) {
-				ConsoleUi.printYellow(l.getDiffText());
+				ui.printYellow(l.getDiffText());
 			} else if (l.getDiffType() == LinePojo.DiffType.INSERTED) {
-				ConsoleUi.printGreen(l.getDiffText());
+				ui.printGreen(l.getDiffText());
 			} else {
-				ConsoleUi.print(l.getDiffText());
+				ui.print(l.getDiffText());
 			}
 		}
 		

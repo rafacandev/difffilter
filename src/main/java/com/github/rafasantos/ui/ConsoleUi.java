@@ -13,27 +13,27 @@ import org.fusesource.jansi.AnsiConsole;
  */
 public class ConsoleUi {
 	
-	public static void finalizeUi() {
+	public void finalizeUi() {
 		AnsiConsole.systemUninstall();
 	}
 	
-	public static void initUi() {
+	public void initUi() {
 		AnsiConsole.systemInstall();
 	}
 	
-	public static void print(String s) {
+	public void print(String s) {
 		Printer.print(s);
 	}
 	
-	public static void printGreen(String s) {
+	public void printGreen(String s) {
 		Printer.print(ansi().fg(Color.GREEN).a(s).reset());
 	}
 	
-	public static void printRed(String s) {
+	public void printRed(String s) {
 		Printer.print(ansi().fg(RED).a(s).reset());
 	}
 	
-	public static void printYellow(String s) {
+	public void printYellow(String s) {
 		Printer.print(ansi().fg(Color.YELLOW).a(s).reset());
 	}
 	
