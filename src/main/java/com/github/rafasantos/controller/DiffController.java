@@ -95,7 +95,7 @@ public class DiffController {
 	private int[] getUniqueKeyIndexesAsInt(String primaryKeyIndexes) {
 		int primaryKeys[] = null;
 		if (primaryKeyIndexes != null && !primaryKeyIndexes.isEmpty()) {
-			if (primaryKeyIndexes.equals("ORIGINAL_LINE")) {
+			if (primaryKeyIndexes.equals("{ORIGINAL_LINE}")) {
 				return null;
 			}
 			String[] primaryKeyIndexesSplitted = primaryKeyIndexes.split(",");

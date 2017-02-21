@@ -66,7 +66,7 @@ public class DiffFilterMain {
 				cliRunner.execute(cli);
 			}
 		} catch (Exception e) {
-			ui.printRed("Error running application: " + e.getMessage());
+			ui.printRed("Error running application: " + e.getClass().getSimpleName() + ": " + e.getMessage());
 			// TODO create a debug parameter and only print the StackTrace if in debug mode.
 			e.printStackTrace();
 		} finally {

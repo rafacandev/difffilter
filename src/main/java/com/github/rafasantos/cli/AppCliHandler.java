@@ -14,6 +14,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import com.github.rafasantos.exception.DiffFilterException;
 import com.github.rafasantos.util.AppConstants;
 
 /**
@@ -57,7 +58,7 @@ public class AppCliHandler {
 	private File firstFile;
 	private File secondFile;
 	private String textDelimiter = "\t";
-	private String uniqueIndexes = "ORIGINAL_LINE";
+	private String uniqueIndexes = "{ORIGINAL_LINE}";
 	private String equalsTemplate = "= {ORIGINAL_LINE}";
 	private String insertTemplate = "+ {ORIGINAL_LINE}";
 	private String updateTemplate = "! {ORIGINAL_LINE}";
@@ -69,8 +70,9 @@ public class AppCliHandler {
 	 * Initialize this class with the provided {@code arguments}.
 	 * @param arguments Command line arguments
 	 * @throws FileNotFoundException
+	 * @throws DiffFilterException 
 	 */
-	public AppCliHandler(String[] arguments) throws FileNotFoundException {
+	public AppCliHandler(String[] arguments) throws FileNotFoundException, DiffFilterException {
 		cliOptions = new Options();
 		cliOptions.addOption( Option.builder(CliOptions.FIRST_INPUT_FILE.getShortText())
 				.longOpt(CliOptions.FIRST_INPUT_FILE.getLongText())
@@ -93,11 +95,11 @@ public class AppCliHandler {
 				.required(false)
 				.hasArg(true)
 				.argName(CliOptions.TEXT_DELIMITER.toString())
-				.desc("The text delimiter used in conjunction to templates (e.g.: insertTemplate, deleteTemplate...)"
-						+ "\nThe delimiter must be included when using templates with numeric index (e.g.: '{0}', etc)."
-						+ "\nOtherwise unexpected results will occur."
-						+ "\nMost common delimiters are: tab '\\t', pipe '|' and comma ',' and the default value is '\\t'."
-						+ "\nThe delimiters are matched against java regular expression.\t\n")
+				.desc("The text delimiter used in conjunction to templates (e.g.: insertTemplate, deleteTemplate...). "
+						+ "The delimiter must be included when using templates with numeric index (e.g.: '{0}', etc). "
+						+ "Otherwise unexpected results will occur. "
+						+ "Most common delimiters are: tab '\\t', pipe '|' and comma ',' and the default value is '\\t'. "
+						+ "The delimiters are matched against java regular expression.\n")
 				.build());
 
 		cliOptions.addOption(Option.builder(CliOptions.EQUALS_TEMPLATE.getShortText())
@@ -143,7 +145,7 @@ public class AppCliHandler {
 				.hasArg(true)
 				.argName(CliOptions.UNIQUE_INDEXES.toString())
 				.desc("The indexes which creates a unique identified. Differently from regular 'diff' which compares files line by line, "
-						+ "this application compares files base on unique identifiers."
+						+ "this application compares files base on unique identifiers. "
 						+ "Indexes are the numerical positions (starting with 0) resulting from spliting a line with <"+ CliOptions.TEXT_DELIMITER +">. "
 						+ "Default, it will assume the entire line is the unique identified."
 						+ "\nExample:"
@@ -163,29 +165,37 @@ public class AppCliHandler {
 		try {
 			isHelp = handleHelp(arguments);
 			if (!isHelp) {
-				
 				CommandLine cli = new DefaultParser().parse(cliOptions, arguments);
 				readOptionValues(cli);
-				if (!firstFile.exists() || !secondFile.exists()) {
-					if (!this.firstFile.exists()) {
-						throw new FileNotFoundException("First file does not exist: " + firstFile.getAbsolutePath());
-					} else if (firstFile.isDirectory()) {
-						throw new FileNotFoundException("The path provided is a directory instead of a valid file: " + firstFile.getAbsolutePath());
-					} else if (!firstFile.isFile()) {
-						throw new FileNotFoundException("The path provided is not a file: " + firstFile.getAbsolutePath());
-					}
-					if (!this.secondFile.exists()) {
-						throw new FileNotFoundException("Second file does not exist: " + secondFile.getAbsolutePath());
-					} else if (firstFile.isDirectory()) {
-						throw new FileNotFoundException("The path provided is a directory instead of a valid file: " + secondFile.getAbsolutePath());
-					} else if (!firstFile.isFile()) {
-						throw new FileNotFoundException("The path provided is not a file: " + secondFile.getAbsolutePath());
-					}
-				}
-				
+				validateOptions();
 			}
 		} catch (ParseException e) {
 			throw new InvalidParameterException(e.getMessage());
+		}
+	}
+
+	private void validateOptions() throws FileNotFoundException, DiffFilterException {
+		if (!firstFile.exists() || !secondFile.exists()) {
+			if (!this.firstFile.exists()) {
+				throw new FileNotFoundException("First file does not exist: " + firstFile.getAbsolutePath());
+			} else if (firstFile.isDirectory()) {
+				throw new FileNotFoundException("The path provided is a directory instead of a valid file: " + firstFile.getAbsolutePath());
+			} else if (!firstFile.isFile()) {
+				throw new FileNotFoundException("The path provided is not a file: " + firstFile.getAbsolutePath());
+			}
+			if (!this.secondFile.exists()) {
+				throw new FileNotFoundException("Second file does not exist: " + secondFile.getAbsolutePath());
+			} else if (firstFile.isDirectory()) {
+				throw new FileNotFoundException("The path provided is a directory instead of a valid file: " + secondFile.getAbsolutePath());
+			} else if (!firstFile.isFile()) {
+				throw new FileNotFoundException("The path provided is not a file: " + secondFile.getAbsolutePath());
+			}
+		}
+		if (!"{ORIGINAL_LINE}".equals(uniqueIndexes)) {
+			// Only integers separated by comma
+			if (!uniqueIndexes.matches("^(\\d+(,\\d+)*)?$")) {
+				throw new DiffFilterException("--uniqueIndexes option accepts only numbers separated by comma or the special flag {ORIGINAL_LINE}");
+			}
 		}
 	}
 
@@ -229,21 +239,30 @@ public class AppCliHandler {
 		
 		
 		String header = ""
-				+ "=== SUMMARY ==="
-				+ "Outputs the differences between --firstFile and --secondFile."
+				+ "=== SUMMARY ===\n"
+				+ "Outputs the differences between two files (--firstFile and --secondFile).\n"
 				+ "Additionally, it is capable to apply templates and indicate the unique indexes used during the comparison."
-				+ ""
-				+ "=== TEMPLATES ==="
-				+ "Templates allow you to change the output of the comparison. The supported templates are: --equalsTemplate, --insertTemplate, --updateTemplate, --deleteTemplate."
-				+ "Values between curly brackets will be replaced by they split indexes. The special flag {"+AppConstants.ORIGINAL_LINE+"} is replaced by the original text."
-				+ "The special flag {"+AppConstants.IGNORE_LINE+"} indicates that lines should not be output.";
+				+ "\n\n"
+				+ "=== TEMPLATES ===\n"
+				+ "Templates changes the output. The supported templates are: --equalsTemplate, --insertTemplate, --updateTemplate, --deleteTemplate. "
+				+ "Use string literals or numbers surrounded by curly brackets to replace by their indexes. "
+				+ "The special flag {ORIGINAL_LINE} is replaced by the original text. The special flag {IGNORE_LINE} indicates that nothing should not be displayed."
+				+ "Values between curly brackets will be replaced by their split indexes. The special flag {"+AppConstants.ORIGINAL_LINE+"} is replaced by the original text. "
+				+ "The special flag {"+AppConstants.IGNORE_LINE+"} indicates that lines should not be output."
+				+ "\n\n"
+				+ "=== EXAMPLES ===\n"
+				+ "Display the differences between first-file.tsv and second-file.tsv, split each line using the TAB character, use the first and second column (-ui 1) as unique identifier, do not display the identical records and display 'NEW ROW: ' followed by the original line. "
+				+ "\n"
+				+ "java -jar difffilter.jar -ff first-file.tsv -sf second-file.tsv -td \"\\t\" -ui \"0,1\" -et {IGNORE_LINE} -it \"NEW ROW: {ORIGINAL_LINE}\""
+				+ "\n\n\n";
+		
 		StringWriter stringWritter = new StringWriter();
 		PrintWriter printWritter = new PrintWriter(stringWritter);
 		HelpFormatter formatter = new HelpFormatter();
 		formatter.setOptionComparator(getDefaultHelpFormatterComparator());
 		formatter.printHelp(printWritter, 
-				150, // Width
-				"java -jar <THIS_JAR.jar> -ff=<"+CliOptions.FIRST_INPUT_FILE+"> -sf=<"+CliOptions.SECOND_INPUT_FILE+"> \n\n", // Usage
+				160, // Width
+				"java -jar difffilter.jar -ff=<"+CliOptions.FIRST_INPUT_FILE+"> -sf=<"+CliOptions.SECOND_INPUT_FILE+"> \n\n", // Usage
 				header,
 				cliOptions, // Options
 				3, // Left pad
