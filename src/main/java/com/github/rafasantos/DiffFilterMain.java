@@ -53,6 +53,7 @@ public class DiffFilterMain {
 			// Handle command line arguments
 			try {
 				cli = new AppCliHandler(arguments);
+				ui.setColoredOuput(cli.isColoredOuput());
 			} catch (Throwable t) {
 				ui.printRed("Not able to start application! " + t.getMessage());
 				ui.println("Exiting the application with error code [1]. Not able to process command line options.");

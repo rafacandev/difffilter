@@ -39,7 +39,8 @@ public class AppCliHandler {
 		EQUALS_TEMPLATE("equalsTemplate", "et"),
 		INSERT_TEMPLATE("insertTemplate", "it"),
 		UPDATE_TEMPLATE("updateTemplate", "ut"),
-		DELETE_TEMPLATE("deleteTemplate", "dt");
+		DELETE_TEMPLATE("deleteTemplate", "dt"),
+		NO_COLOR("noColors", "noColors");
 
 		private final String longText;
 		private final String shortText;
@@ -63,6 +64,7 @@ public class AppCliHandler {
 	private String insertTemplate = "+ {ORIGINAL_LINE}";
 	private String updateTemplate = "! {ORIGINAL_LINE}";
 	private String deleteTemplate = "- {ORIGINAL_LINE}";
+	private boolean isColoredOuput = true;
 	private Options cliOptions;
 	private boolean isHelp = false;
 
@@ -138,6 +140,13 @@ public class AppCliHandler {
 						+ "but does not exist on the <"+CliOptions.SECOND_INPUT_FILE+">\n")
 				.build());
 
+		cliOptions.addOption(Option.builder(CliOptions.NO_COLOR.getShortText())
+				.longOpt(CliOptions.NO_COLOR.getLongText())
+				.required(false)
+				.hasArg(false)
+				.argName(CliOptions.NO_COLOR.toString())
+				.desc("Disable output colors. It will write in the default output color.\n")
+				.build());
 		
 		cliOptions.addOption(Option.builder(CliOptions.UNIQUE_INDEXES.getShortText())
 				.longOpt(CliOptions.UNIQUE_INDEXES.getLongText())
@@ -305,6 +314,14 @@ public class AppCliHandler {
 	}
 
 	/**
+	 * If the output should support colors
+	 * @return
+	 */
+	public boolean isColoredOuput() {
+		return isColoredOuput;
+	}
+
+	/**
 	 * If is a help command line (e.g.: -h)
 	 * @return
 	 */
@@ -319,6 +336,7 @@ public class AppCliHandler {
 		this.insertTemplate = cli.getOptionValue(CliOptions.INSERT_TEMPLATE.getShortText(), this.insertTemplate);
 		this.updateTemplate = cli.getOptionValue(CliOptions.UPDATE_TEMPLATE.getShortText(), this.updateTemplate);
 		this.deleteTemplate = cli.getOptionValue(CliOptions.DELETE_TEMPLATE.getShortText(), this.deleteTemplate);
+		this.isColoredOuput = !cli.hasOption(CliOptions.NO_COLOR.getShortText());
 		String firstFilePath = cli.getOptionValue(CliOptions.FIRST_INPUT_FILE.getShortText());
 		this.firstFile = new File(firstFilePath);
 		String secondFilePath = cli.getOptionValue(CliOptions.SECOND_INPUT_FILE.getShortText());

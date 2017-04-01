@@ -150,6 +150,9 @@ java -jar difffilter.jar -ff first-file.tsv -sf second-file.tsv -td "\t" -ui "0,
                                             Given <TEXT_DELIMITER> = ',' when the line '1,Robert,Smith' and '1,J,Smith'.
                                             If <UNIQUE_INDEXES> is 0 or 2 it will flag the two lines as 'updated'.
                                             If <UNIQUE_INDEXES> is 1 it will flag the two lines as 'inserted'.
+   
+   -noColors,--noColors                     Disable output colors. It will write in the default output color.                                            
+                                            
    -dt,--deleteTemplate <DELETE_TEMPLATE>   Template used when a line is identified as 'deleted', hence it exist on the <FIRST_INPUT_FILE>; but does not exist
                                             on the <SECOND_INPUT_FILE>
    -ut,--updateTemplate <UPDATE_TEMPLATE>   Template used when a line is identified as 'updated', hence it exist on both the <FIRST_INPUT_FILE> and the

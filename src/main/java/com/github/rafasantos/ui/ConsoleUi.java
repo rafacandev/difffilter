@@ -13,34 +13,56 @@ import org.fusesource.jansi.AnsiConsole;
  */
 public class ConsoleUi {
 	
+	private boolean isColoredOuput = true;
+	
 	public void finalizeUi() {
 		AnsiConsole.systemUninstall();
 	}
-	
+
 	public void initUi() {
 		AnsiConsole.systemInstall();
+	}
+
+	public boolean isColoredOuput() {
+		return isColoredOuput;
+	}
+	
+	public void printGreen(String s) {
+		if (s != null) {
+			if (isColoredOuput) {
+				Printer.println(ansi().fg(Color.GREEN).a(s).reset());
+			} else {
+				Printer.println(s);
+			}
+		}
 	}
 	
 	public void println(String s) {
 		Printer.println(s);
 	}
 	
-	public void printGreen(String s) {
-		if (s != null) {
-			Printer.println(ansi().fg(Color.GREEN).a(s).reset());
-		}
-	}
-	
 	public void printRed(String s) {
 		if (s != null) {
-			Printer.println(ansi().fg(RED).a(s).reset());
+			if (isColoredOuput) {
+				Printer.println(ansi().fg(RED).a(s).reset());
+			} else {
+				Printer.println(s);
+			}
 		}
 	}
 	
 	public void printYellow(String s) {
 		if (s != null) {
-			Printer.println(ansi().fg(Color.YELLOW).a(s).reset());
+			if (isColoredOuput) {
+				Printer.println(ansi().fg(Color.YELLOW).a(s).reset());
+			} else {
+				Printer.println(s);
+			}
 		}
+	}
+	
+	public void setColoredOuput(boolean isColoredOuput) {
+		this.isColoredOuput = isColoredOuput;
 	}
 	
 }
