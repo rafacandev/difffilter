@@ -200,16 +200,14 @@ public class AppCliHandler {
 				throw new FileNotFoundException("The path provided is not a file: " + secondFile.getAbsolutePath());
 			}
 		}
-		if (!"{ORIGINAL_LINE}".equals(uniqueIndexes)) {
-			// Only integers separated by comma
-			if (!uniqueIndexes.matches("^(\\d+(,\\d+)*)?$")) {
-				throw new DiffFilterException("--uniqueIndexes option accepts only numbers separated by comma or the special flag {ORIGINAL_LINE}");
-			}
+		// uniqueIndexs must be {ORIGINAL_LINE} or contain numbers separated by comma
+		if (!"{ORIGINAL_LINE}".equals(uniqueIndexes) && !uniqueIndexes.matches("^(\\d+(,\\d+)*)?$")) {
+			throw new DiffFilterException("--uniqueIndexes option accepts only numbers separated by comma or the special flag {ORIGINAL_LINE}");
 		}
 	}
 
 	private Comparator<Option> getDefaultHelpFormatterComparator() {
-		Comparator<Option> defaultHelpOrder = (Option o1, Option o2) -> {
+		return (Option o1, Option o2) -> {
 			if (CliOptions.HELP.toString().equals(o1.getArgName())) {
 				return 1000;
 			} else if (CliOptions.FIRST_INPUT_FILE.toString().equals(o1.getArgName())) {
@@ -225,7 +223,6 @@ public class AppCliHandler {
 			}
 			return -1;
 		};
-		return defaultHelpOrder;
 	}
 
 	public String getDeleteTemplate() {
@@ -307,10 +304,7 @@ public class AppCliHandler {
 		Option helpOption = cliOptions.getOption(CliOptions.HELP.getShortText());
 		helpOptions.addOption(helpOption);
 		CommandLine helpCli = new DefaultParser().parse(helpOptions, arguments, true);
-		if (helpCli.hasOption("h")) {
-			return true;
-		}
-		return false;
+		return (helpCli.hasOption("h"));
 	}
 
 	/**

@@ -32,13 +32,11 @@ public class CliExecutor {
 	 * @throws DiffFilterException
 	 */
 	public void execute(AppCliHandler cli) throws DiffFilterException {
-		FileInputStream ffis = null;
-		FileInputStream sfis = null;
 		List<LinePojo> response = null;
-		try {
-			ffis = new FileInputStream(cli.getFirstFile());
+		try ( FileInputStream ffis = new FileInputStream(cli.getFirstFile());
+			  FileInputStream sfis = new FileInputStream(cli.getSecondFile())
+			) {
 			BufferedReader firstFileReader = new BufferedReader(new InputStreamReader(ffis));
-			sfis = new FileInputStream(cli.getSecondFile());
 			BufferedReader secondFileReader = new BufferedReader(new InputStreamReader(sfis));
 			response = diffController.getDiff(
 					firstFileReader,
@@ -51,19 +49,7 @@ public class CliExecutor {
 					cli.getDeleteTemplate());
 		} catch (IOException e) {
 			throw new DiffFilterException(e.getMessage());
-		} finally {
-			try {
-				if (ffis != null) {
-					ffis.close();
-				}
-				if (sfis != null) {
-					sfis.close();
-				}
-			} catch (IOException e) {
-				throw new DiffFilterException(e.getMessage());
-			}
 		}
-		
 		for(LinePojo l : response) {
 			if (l.getDiffType() == LinePojo.DiffType.DELETED) {
 				ui.printRed(l.getDiffText());
@@ -75,7 +61,6 @@ public class CliExecutor {
 				ui.println(l.getDiffText());
 			}
 		}
-		
 	}
 
 }
