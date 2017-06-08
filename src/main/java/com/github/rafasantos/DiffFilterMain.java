@@ -4,6 +4,7 @@ import com.github.rafasantos.cli.AppCliHandler;
 import com.github.rafasantos.cli.CliExecutor;
 import com.github.rafasantos.context.AppContext;
 import com.github.rafasantos.context.AppContextEagerlyLoaded;
+import com.github.rafasantos.error.ErrorReport;
 import com.github.rafasantos.ui.ConsoleUi;
 
 /**
@@ -65,6 +66,14 @@ public class DiffFilterMain {
 			} else {
 				// Proceed normally
 				cliRunner.execute(cli);
+			}
+			if (!ErrorReport.getErrors().isEmpty()) {
+				ui.printRed(" ----------------------------------");
+				ui.printRed(" ===  Errors durring execution! ===");
+				ui.printRed(" ----------------------------------");
+				ErrorReport.getErrors().forEach(e -> {
+					ui.printYellow(e + "\n\n");
+				});
 			}
 		} catch (Exception e) {
 			ui.printRed("Error running application: " + e.getClass().getSimpleName() + ": " + e.getMessage());

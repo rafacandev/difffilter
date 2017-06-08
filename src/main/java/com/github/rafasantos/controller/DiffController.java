@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.github.rafasantos.context.AppContext;
+import com.github.rafasantos.error.ErrorReport;
 import com.github.rafasantos.formarter.LinePojoFormatter;
 import com.github.rafasantos.pojo.LineDelimitedPojo;
 import com.github.rafasantos.pojo.LinePojo;
@@ -71,23 +72,27 @@ public class DiffController {
 	}
 
 	private String formatLinePojo(String equalsTemplate, String insertTemplate, String updateTemplate,
-			String deleteTemplate, LineDelimitedPojo l) {
+			String deleteTemplate, LineDelimitedPojo line) {
 		String result = new String();
-		switch (l.getDiffType()) {
-		case EQUALS:
-			result = LinePojoFormatter.formatTemplate(equalsTemplate, l);
-			break;
-		case INSERTED:
-			result = LinePojoFormatter.formatTemplate(insertTemplate, l);
-			break;
-		case UPDATED:
-			result = LinePojoFormatter.formatTemplate(updateTemplate, l);
-			break;
-		case DELETED:
-			result = LinePojoFormatter.formatTemplate(deleteTemplate, l);
-			break;
-		default:
-			break;
+		try {
+			switch (line.getDiffType()) {
+			case EQUALS:
+				result = LinePojoFormatter.formatTemplate(equalsTemplate, line);
+				break;
+			case INSERTED:
+				result = LinePojoFormatter.formatTemplate(insertTemplate, line);
+				break;
+			case UPDATED:
+				result = LinePojoFormatter.formatTemplate(updateTemplate, line);
+				break;
+			case DELETED:
+				result = LinePojoFormatter.formatTemplate(deleteTemplate, line);
+				break;
+			default:
+				break;
+			}
+		} catch (Exception e) {
+			ErrorReport.addError(e.getMessage(), line.getLineNumber(), line.getOriginalLine());
 		}
 		return result;
 	}

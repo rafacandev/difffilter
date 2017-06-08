@@ -10,7 +10,6 @@ import com.github.rafasantos.util.AppConstants;
 
 public class LinePojoFormatter {
 	
-
 	public static String formatTemplate(String template, LineDelimitedPojo p) {
 		Set<String> matches = findMatches(template);
 		for (String s : matches) {
@@ -21,16 +20,12 @@ public class LinePojoFormatter {
 				template = template.replace("{" + s + "}", p.getOriginalLine());
 			} else {
 				String value = "";
-				try {
-					Integer key = new Integer(s);
-					String valueCandidate = p.getField(key);
-					if (valueCandidate != null) {
-						value = valueCandidate;
-					}
-				} catch (Exception e) {
-					// TODO: log exception
+				Integer key = new Integer(s);
+				String valueCandidate = p.getField(key);
+				if (valueCandidate != null) {
+					value = valueCandidate;
 				}
-				template = template.replaceAll("\\{" + s + "\\}", value);
+				template = template.replace("{" + s + "}", value);
 			}
 		}
 		return template;
