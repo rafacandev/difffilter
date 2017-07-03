@@ -64,7 +64,7 @@ public class AppCliHandler {
 	private String insertTemplate = "+ {ORIGINAL_LINE}";
 	private String updateTemplate = "! {ORIGINAL_LINE}";
 	private String deleteTemplate = "- {ORIGINAL_LINE}";
-	private boolean isColoredOuput = true;
+	private boolean isColoredOuput = false;
 	private Options cliOptions;
 	private boolean isHelp = false;
 
@@ -324,13 +324,17 @@ public class AppCliHandler {
 	}
 
 	private void readOptionValues(CommandLine cli) {
+		// Colors are only supported on consoles. Otherwise the output may get strange characters (e.g.: when piping to a file).
+		if (System.console() != null) {
+			// If has the NO_COLOR option, then isColoredOuput=false
+			this.isColoredOuput = !cli.hasOption(CliOptions.NO_COLOR.getShortText());
+		}
 		this.textDelimiter = cli.getOptionValue(CliOptions.TEXT_DELIMITER.getShortText(), this.textDelimiter);
 		this.uniqueIndexes = cli.getOptionValue(CliOptions.UNIQUE_INDEXES.getShortText(), this.uniqueIndexes);
 		this.equalsTemplate = cli.getOptionValue(CliOptions.EQUALS_TEMPLATE.getShortText(), this.equalsTemplate);
 		this.insertTemplate = cli.getOptionValue(CliOptions.INSERT_TEMPLATE.getShortText(), this.insertTemplate);
 		this.updateTemplate = cli.getOptionValue(CliOptions.UPDATE_TEMPLATE.getShortText(), this.updateTemplate);
 		this.deleteTemplate = cli.getOptionValue(CliOptions.DELETE_TEMPLATE.getShortText(), this.deleteTemplate);
-		this.isColoredOuput = !cli.hasOption(CliOptions.NO_COLOR.getShortText());
 		String firstFilePath = cli.getOptionValue(CliOptions.FIRST_INPUT_FILE.getShortText());
 		this.firstFile = new File(firstFilePath);
 		String secondFilePath = cli.getOptionValue(CliOptions.SECOND_INPUT_FILE.getShortText());
