@@ -76,20 +76,33 @@ public class AppCliHandler {
 	 */
 	public AppCliHandler(String[] arguments) throws FileNotFoundException, DiffFilterException {
 		cliOptions = new Options();
-		cliOptions.addOption( Option.builder(CliOptions.FIRST_INPUT_FILE.getShortText())
+
+		/*
+		* If is short-handed for first and second file with using CliOptions.FIRST_INPUT_FILE
+		* and CliOptions.SECOND_INPUT_FILE dashes
+		*/
+		boolean isArgumentsWithOptions = isArgumentsWithOptions(arguments);
+		String[] formattedArguments;
+		if (isArgumentsWithOptions) {
+			formattedArguments = buildFormattedArguments(arguments);
+		} else {
+			formattedArguments = arguments;
+		}
+
+		cliOptions.addOption(Option.builder(CliOptions.FIRST_INPUT_FILE.getShortText())
 				.longOpt(CliOptions.FIRST_INPUT_FILE.getLongText())
-				.required(true)
+				.required(isArgumentsWithOptions)
 				.hasArg(true)
 				.argName(CliOptions.FIRST_INPUT_FILE.toString())
-				.desc("Mandatory, the file path of the first file to be compared.\n")
+				.desc("The file path of the first file to be compared.\n")
 				.build());
 		
 		cliOptions.addOption(Option.builder(CliOptions.SECOND_INPUT_FILE.getShortText())
 				.longOpt(CliOptions.SECOND_INPUT_FILE.getLongText())
-				.required(true)
+				.required(isArgumentsWithOptions)
 				.hasArg(true)
 				.argName(CliOptions.SECOND_INPUT_FILE.toString())
-				.desc("Mandatory, the file path of the second file to be compared.\n")
+				.desc("The file path of the second file to be compared.\n")
 				.build());
 
 		cliOptions.addOption( Option.builder(CliOptions.TEXT_DELIMITER.getShortText())
@@ -172,14 +185,36 @@ public class AppCliHandler {
 				.build());
 		
 		try {
-			isHelp = handleHelp(arguments);
+			isHelp = handleHelp(formattedArguments);
 			if (!isHelp) {
-				CommandLine cli = new DefaultParser().parse(cliOptions, arguments);
+				CommandLine cli = new DefaultParser().parse(cliOptions, formattedArguments);
 				readOptionValues(cli);
 				validateOptions();
 			}
 		} catch (ParseException e) {
 			throw new InvalidParameterException(e.getMessage());
+		}
+	}
+
+	private String[] buildFormattedArguments(String[] arguments) {
+		// Adds dashes to the first and second arguments
+		String[] result = new String[arguments.length + 2];
+		result[0] = "--" + CliOptions.FIRST_INPUT_FILE.longText;
+		result[1] = arguments[0];
+		result[2] = "--" + CliOptions.SECOND_INPUT_FILE.longText;
+		result[3] = arguments[1];
+		// Copy the remaining arguments
+		for (int i = 2; i < arguments.length; i++) {
+			result[2+i] = arguments[i];
+		}
+		return result;
+	}
+
+	private boolean isArgumentsWithOptions(String[] arguments) {
+		if (arguments.length > 1 && !arguments[0].startsWith("-") && !arguments[1].startsWith("-")) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 
@@ -244,8 +279,8 @@ public class AppCliHandler {
 	public String getHelpText() {
 		
 		
-		String header = ""
-				+ "=== SUMMARY ===\n"
+		String header =
+				  "=== SUMMARY ===\n"
 				+ "Outputs the differences between two files (--firstFile and --secondFile).\n"
 				+ "Additionally, it is capable to apply templates and indicate the unique indexes used during the comparison."
 				+ "\n\n"
@@ -259,8 +294,15 @@ public class AppCliHandler {
 				+ "=== EXAMPLES ===\n"
 				+ "Display the differences between first-file.tsv and second-file.tsv, split each line using the TAB character, use the first and second column (-ui 1) as unique identifier, do not display the identical records and display 'NEW ROW: ' followed by the original line. "
 				+ "\n"
-				+ "java -jar difffilter.jar -ff first-file.tsv -sf second-file.tsv -td \"\\t\" -ui \"0,1\" -et {IGNORE_LINE} -it \"NEW ROW: {ORIGINAL_LINE}\""
-				+ "\n\n\n";
+				+ "    java -jar difffilter.jar -ff first-file.tsv -sf second-file.tsv -td \"\\t\" -ui \"0,1\" -et {IGNORE_LINE} -it \"NEW ROW: {ORIGINAL_LINE}\""
+				+ "\n\n"
+				+ "=== SHORT-HANDED USAGE===\n"
+				+ "When the first two arguments do not contains dashes (-) the application assumes that they are --firstFile and --secondFile respectively\n"
+				+ "Example:\n"
+				+ "    java -jar difffilter.jar first-file.tsv second-file.tsv\n"
+				+ "is equivalent to: \n"
+				+ "    java -jar difffilter.jar --firstFile first-file.tsv --secondFile second-file.tsv\n"
+				+ "\n\n";
 		
 		StringWriter stringWritter = new StringWriter();
 		PrintWriter printWritter = new PrintWriter(stringWritter);
